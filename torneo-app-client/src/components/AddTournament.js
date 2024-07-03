@@ -1,64 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import React, { useState,useEffect } from 'react';
+import api from '../services/api'; // Asegúrate de que el path sea correcto según la estructura real
 
 const AddTournament = () => {
   const [name, setName] = useState('');
-  const [players, setPlayers] = useState([]);
-  const [selectedPlayers, setSelectedPlayers] = useState([]);
-
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      const response = await api.get('/players');
-      setPlayers(response.data);
-    };
-    fetchPlayers();
-  }, []);
+  const [playerIds, setPlayerIds] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/tournaments', { name, players: selectedPlayers });
+      const response = await api.post('/tournaments', { name, playerIds });
+      console.log('Torneo creado:', response.data);
       setName('');
-      setSelectedPlayers([]);
-      alert('Tournament added successfully');
+      setPlayerIds([]);
+      alert('Torneo creado exitosamente');
     } catch (error) {
-      console.error('Error adding tournament:', error);
-    }
-  };
-
-  const handlePlayerSelect = (e) => {
-    const playerId = e.target.value;
-    if (e.target.checked) {
-      setSelectedPlayers([...selectedPlayers, playerId]);
-    } else {
-      setSelectedPlayers(selectedPlayers.filter((id) => id !== playerId));
+      console.error('Error al crear torneo:', error);
+      alert('Error al crear torneo');
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Add Tournament</h2>
+      <h2>Agregar Torneo</h2>
       <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="Tournament Name"
+        placeholder="Nombre del Torneo"
         required
       />
-      <h3>Select Players</h3>
-      {players.map((player) => (
-        <div key={player._id}>
-          <label>
-            <input
-              type="checkbox"
-              value={player._id}
-              onChange={handlePlayerSelect}
-            />
-            {player.name}
-          </label>
-        </div>
-      ))}
-      <button type="submit">Add Tournament</button>
+      <input
+        type="text"
+        value={playerIds.join(', ')}
+        onChange={(e) => setPlayerIds(e.target.value.split(',').map(id => id.trim()))}
+        placeholder="IDs de Jugadores separados por coma"
+        required
+      />
+      <button type="submit">Crear Torneo</button>
     </form>
   );
 };

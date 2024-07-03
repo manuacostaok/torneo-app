@@ -1,5 +1,6 @@
+// AddPlayer.js
 import React, { useState } from 'react';
-import api from '../services/api';
+import axios from 'axios';
 
 const AddPlayer = () => {
   const [name, setName] = useState('');
@@ -7,7 +8,8 @@ const AddPlayer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/players', { name });
+      const response = await axios.post('/api/players', { name });
+      console.log('Player added successfully:', response.data);
       setName('');
       alert('Player added successfully');
     } catch (error) {
